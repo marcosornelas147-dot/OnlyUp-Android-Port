@@ -21,6 +21,8 @@ jobs:
           cp -r /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/4.3.stable
           ls -la ~/.local/share/godot/export_templates
           mkdir -p "$HOME/.android" "$HOME/.config/godot"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platforms;android-34" "build-tools;34.0.0"
           keytool -genkeypair -v -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 10000
           JAVA_PATH="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
           cat > "$HOME/.config/godot/editor_settings-4.tres" <<SETTINGS
