@@ -42,6 +42,10 @@ jobs:
           export ANDROID_HOME=/usr/lib/android-sdk
           export PATH="$JAVA_HOME/bin:$ANDROID_HOME/platform-tools:$PATH"
           godot --headless --path . --editor --quit
+          echo "--- editor settings after initialization ---"
+          cat "$HOME/.config/godot/editor_settings-4.tres"
+          echo "--- Android SDK ---"
+          ls -la "$ANDROID_HOME" "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
           godot --headless --verbose --path . --export-debug 'Android ARMv7' ../OnlyUpAlpha-Android.apk
           test -s ../OnlyUpAlpha-Android.apk
       - name: Upload APK
