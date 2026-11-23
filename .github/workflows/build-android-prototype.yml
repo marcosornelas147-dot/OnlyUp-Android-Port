@@ -46,7 +46,7 @@ jobs:
           cat "$HOME/.config/godot/editor_settings-4.tres"
           echo "--- Android SDK ---"
           ls -la "$ANDROID_HOME" "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
-          godot --headless --verbose --path . --export-debug 'Android ARMv7' ../OnlyUpAlpha-Android.apk
+          godot --headless --verbose --path . --export-debug 'Android ARMv7' ../OnlyUpAlpha-Android-unsigned.apk
           zipalign -f 4 ../OnlyUpAlpha-Android-unsigned.apk ../OnlyUpAlpha-Android-aligned.apk
           export KS_PASS=android
           apksigner sign --ks "$HOME/.android/debug.keystore" --ks-pass env:KS_PASS --key-pass env:KS_PASS --out ../OnlyUpAlpha-Android.apk ../OnlyUpAlpha-Android-aligned.apk
