@@ -160,10 +160,10 @@ func _input(event: InputEvent) -> void:
 		elif not event.pressed and event.index == touch_look_id:
 			touch_look_id = -1
 	elif event is InputEventScreenDrag and event.index == touch_look_id:
-		var delta := event.position - last_touch
+		var drag_delta: Vector2 = event.position - last_touch
 		last_touch = event.position
-		yaw -= delta.x * 0.006
-		pitch = clamp(pitch - delta.y * 0.004, -0.9, 0.35)
+		yaw -= drag_delta.x * 0.006
+		pitch = clamp(pitch - drag_delta.y * 0.004, -0.9, 0.35)
 	elif event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 		yaw -= event.relative.x * 0.006
 		pitch = clamp(pitch - event.relative.y * 0.004, -0.9, 0.35)
