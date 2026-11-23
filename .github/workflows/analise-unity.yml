@@ -1,0 +1,56 @@
+name: Analisar projeto Only Up Alpha
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '**'
+      - '!.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    name: Verificar estrutura Unity e Android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Analisar arquivos
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+          REPORT=reports/analise-unity-android.txt
+          {
+            echo 'ONLY UP ALPHA - RELATORIO DE ANALISE'
+            echo '===================================='
+            echo "Commit: $GITHUB_SHA"
+            echo
+            echo 'Arquivos no repositorio:'
+            find . -type f -not -path './.git/*' | sort | head -n 500
+            echo
+            echo 'Verificacao de projeto Unity:'
+            if find . -type f -path '*/ProjectSettings/ProjectVersion.txt' -print -quit | grep -q .; then echo 'OK: ProjectSettings/ProjectVersion.txt encontrado.'; else echo 'AUSENTE: projeto Unity editavel (ProjectSettings/ProjectVersion.txt).'; fi
+            if find . -type d -name Assets -print -quit | grep -q .; then echo 'OK: pasta Assets encontrada.'; else echo 'AUSENTE: pasta Assets.'; fi
+            echo
+            echo 'Verificacao de build Android:'
+            if find . -type f \\( -name '*.aab' -o -name '*.apk' \\) -print -quit | grep -q .; then echo 'Ja existe APK/AAB no repositorio.'; else echo 'Nenhum APK/AAB encontrado.'; fi
+            echo
+            echo 'RESULTADO:'
+            if find . -type f -path '*/ProjectSettings/ProjectVersion.txt' -print -quit | grep -q . && find . -type d -name Assets -print -quit | grep -q .; then
+              echo 'Estrutura Unity detectada. Build Android ainda depende do Unity Editor, Android Build Support e licenca configurada nos secrets.'
+            else
+              echo 'BUILD ANDROID NAO EXECUTADO: este repositorio ainda nao contem um projeto Unity editavel completo.'
+              echo 'A compilacao Windows (.exe e *_Data) nao pode ser convertida diretamente em APK pelo GitHub Actions.'
+            fi
+          } | tee "$REPORT"
+
+      - name: Publicar relatorio
+        uses: actions/upload-artifact@v4
+        with:
+          name: analise-only-up-alpha
+          path: reports/analise-unity-android.txt
+          if-no-files-found: error
