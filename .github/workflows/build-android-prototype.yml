@@ -1,0 +1,32 @@
+name: Build Only Up Alpha Android prototype
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'godot/**'
+      - '.github/workflows/build-android-prototype.yml'
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Godot and Android export templates
+        run: |
+          godot --version
+          ls -la ~/.local/share/godot/export_templates || true
+      - name: Build Android ARMv7 APK
+        run: |
+          cd godot
+          godot --headless --path . --editor --quit
+          godot --headless --path . --export-debug 'Android ARMv7' ../OnlyUpAlpha-Android.apk
+          test -s ../OnlyUpAlpha-Android.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: OnlyUpAlpha-Android-ARMv7
+          path: OnlyUpAlpha-Android.apk
+          if-no-files-found: error
