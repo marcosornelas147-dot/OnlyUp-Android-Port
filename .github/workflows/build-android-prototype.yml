@@ -47,6 +47,10 @@ jobs:
           echo "--- Android SDK ---"
           ls -la "$ANDROID_HOME" "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
           godot --headless --verbose --path . --export-debug 'Android ARMv7' ../OnlyUpAlpha-Android.apk
+          zipalign -f 4 ../OnlyUpAlpha-Android-unsigned.apk ../OnlyUpAlpha-Android-aligned.apk
+          export KS_PASS=android
+          apksigner sign --ks "$HOME/.android/debug.keystore" --ks-pass env:KS_PASS --key-pass env:KS_PASS --out ../OnlyUpAlpha-Android.apk ../OnlyUpAlpha-Android-aligned.apk
+          apksigner verify ../OnlyUpAlpha-Android.apk
           test -s ../OnlyUpAlpha-Android.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
