@@ -30,21 +30,21 @@ jobs:
             echo "Commit: $GITHUB_SHA"
             echo
             echo 'Arquivos no repositorio:'
-            find . -type f -not -path './.git/*' | sort | head -n 500
+            find . -type f -not -path './.git/*' | sort | head -n 500 || true
             echo
             echo 'Verificacao de projeto Unity:'
-            if find . -type f -path '*/ProjectSettings/ProjectVersion.txt' -print -quit | grep -q .; then echo 'OK: ProjectSettings/ProjectVersion.txt encontrado.'; else echo 'AUSENTE: projeto Unity editavel (ProjectSettings/ProjectVersion.txt).'; fi
+            if find . -type f -path '*/ProjectSettings/ProjectVersion.txt' -print -quit | grep -q .; then echo 'OK: ProjectSettings/ProjectVersion.txt encontrado.'; else echo 'AUSENTE: projeto Unity editavel.'; fi
             if find . -type d -name Assets -print -quit | grep -q .; then echo 'OK: pasta Assets encontrada.'; else echo 'AUSENTE: pasta Assets.'; fi
             echo
             echo 'Verificacao de build Android:'
-            if find . -type f \\( -name '*.aab' -o -name '*.apk' \\) -print -quit | grep -q .; then echo 'Ja existe APK/AAB no repositorio.'; else echo 'Nenhum APK/AAB encontrado.'; fi
+            if find . -type f | grep -E '\.(apk|aab)$' | head -n 1 | grep -q .; then echo 'Ja existe APK/AAB no repositorio.'; else echo 'Nenhum APK/AAB encontrado.'; fi
             echo
             echo 'RESULTADO:'
             if find . -type f -path '*/ProjectSettings/ProjectVersion.txt' -print -quit | grep -q . && find . -type d -name Assets -print -quit | grep -q .; then
-              echo 'Estrutura Unity detectada. Build Android ainda depende do Unity Editor, Android Build Support e licenca configurada nos secrets.'
+              echo 'Estrutura Unity detectada. Build Android depende do Unity Editor, Android Build Support e licenca.'
             else
-              echo 'BUILD ANDROID NAO EXECUTADO: este repositorio ainda nao contem um projeto Unity editavel completo.'
-              echo 'A compilacao Windows (.exe e *_Data) nao pode ser convertida diretamente em APK pelo GitHub Actions.'
+              echo 'BUILD ANDROID NAO EXECUTADO: falta projeto Unity editavel completo.'
+              echo 'A compilacao Windows nao pode ser convertida diretamente em APK.'
             fi
           } | tee "$REPORT"
 
